@@ -1,4 +1,4 @@
-class LinkedList
+class Bucket
 
   attr_accessor :head, :size
 
@@ -10,6 +10,10 @@ class LinkedList
   def add_head(key, value)
     self.size += 1
     self.head = Node.new(key, value, nil)  
+  end
+
+  def put(key, value)
+    self.key?(key) ? self.change(key, value) : self.append(key, value)
   end
 
   def append(key, value, node = self.head)
@@ -69,16 +73,16 @@ class LinkedList
     end
   end
 
-  def get_key(keys=[],node=self.head)
+  def get_keys(keys=[],node=self.head)
     return keys if node == nil
     keys << node.key
-    get_key(keys,node.next_node)
+    get_keys(keys,node.next_node)
   end
 
-  def get_value(values=[],node=self.head)
+  def get_values(values=[],node=self.head)
     return values if node == nil
     values << node.value
-    get_value(values,node.next_node)
+    get_values(values,node.next_node)
   end
 end
 

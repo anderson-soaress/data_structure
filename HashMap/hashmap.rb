@@ -5,7 +5,7 @@ class HashMap
   attr_accessor :buckets, :size, :capacity
 
   def initialize
-    @buckets = Array.new(16)
+    @buckets = Array.new(4)
     @size = 0
     @capacity = @buckets.length
   end
@@ -20,19 +20,23 @@ class HashMap
   end
 
   def load_factor
-    if size >= capacity*0.75
-      self.size *= 2
+    entries = self.entries
+    self.buckets = Array.new(capacity*2)
+    self.capacity = buckets.length
+    self.size = 0
+
+    for entrie in entries do
+      self.set(entrie[0], entrie[1])
     end
   end
 
   def has?(key, index=0)
-    if buckets[index].hash == hash(key)
-      return true
-    elsif buckets[index] == nil
+    if !(buckets[index] == nil)
+      return true if buckets[index].key?(key)
+    elsif index > capacity
       return false
-    else
-      has?(key,index+1)
     end
+    has?(key, index+1)
   end
 
   def set(key, value)
@@ -46,13 +50,14 @@ class HashMap
       buckets[index] = Bucket.new 
       buckets[index].put(key, value)
     end  
+    load_factor() if size >= capacity*0.75
   end
 
   def get(key)
     index = hash(key)%capacity
     raise IndexError if index.negative? || index >= @buckets.length
 
-    buckets[index].get(key)
+    buckets[index] == nil ? nil : buckets[index].find(key)
   end
   
   def remove(key)
@@ -63,13 +68,13 @@ class HashMap
     self.size -= 1
   end
 
-  def length(index=0, lenght=0)
+  def length(index=0, length=0)
     if !(buckets[index] == nil)
-      lenght += buckets[index].length
+      length += buckets[index].size
     elsif index > capacity
-      return lenght
+      return length
     end
-    length(index+1, lenght)
+    length(index+1, length)
   end
 
   def clear(index=0)
@@ -80,7 +85,7 @@ class HashMap
 
   def keys(index=0, keys=[])
     if !(buckets[index] == nil)
-      keys += buckets[index].get_key
+      keys += buckets[index].get_keys
     elsif index > capacity
       return keys
     end
@@ -89,7 +94,7 @@ class HashMap
 
   def values(index=0, values=[])
     if !(buckets[index] == nil)
-      values += buckets[index].get_value
+      values += buckets[index].get_values
     elsif index > capacity
       return values
     end
@@ -99,59 +104,22 @@ class HashMap
   def entries(index=0, entries=[])
     if !(buckets[index] == nil)
       arr = []
-      arr << buckets[index].get_key + buckets[index].get_value
-      entries << arr
+      arr += (buckets[index].get_keys + buckets[index].get_values)
+      x = 0
+      until x >= arr.length/2 do
+        arr2=[]
+        if arr.length > 2 
+          arr2 << arr[x] << arr[x+arr.length/2]
+          entries << arr2
+        else
+          entries << arr
+          break
+        end
+        x += 1
+      end
     elsif index > capacity
       return entries
     end
     entries(index+1, entries)
   end
 end
-
-class Bucket
-
-  attr_accessor :list
-
-  def initialize
-    @list = LinkedList.new
-  end
-
-  def put(key, value)
-     list.key?(key) ? list.change(key, value) : list.append(key, value)
-  end
-
-  def get(key)
-    list.find(key)
-  end
-
-  def remove(key)
-    list.remove(key)
-  end
-
-  def length
-    list.size
-  end
-
-  def get_key
-    list.get_key
-  end
-
-  def get_value
-    list.get_value
-  end
-end
-
-map = HashMap.new
-map.set("Anderson","Soares")
-map.set("Carlos", "Gabriel")
-map.set("Junior", 2)
-map.set("Almeida", "t")
-map.set("Carla", "Andre")
-map.set("Pedro", 3)
-map.set("Jose", 24)
-map.set("GUs",30)
-p map
-p map.length
-p map.keys
-p map.values
-p map.entries
