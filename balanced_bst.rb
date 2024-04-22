@@ -18,24 +18,36 @@ class Tree
     @root = build_tree
   end
 
-  def build_tree(first = 0, last = sorted_array.length-1, array = sorted_array, root=nil)
-    return if first > last
+  def build_tree(array = self.sorted_array, root=nil)
+    if array.length <= 0
+      return nil
+    elsif array.length == 1
+      return Node.new(array[0])
+    else
+      array.length.even? ? data = array[array.length/2] : data = array[(array.length/2) + 0.5] 
 
-    array = array[first..last]
+      root = Node.new(data)
 
-    array.length.even? ? data = array[array.length/2] : data = array[(array.length/2) + 0.5] if root == nil
+      root.left = build_tree(array[0..array.find_index(data)-1]) if root.left == nil 
 
-    return if data == nil
-      
-    root = Node.new(data)
+      root.right = build_tree(array[array.find_index(data)+1..array.length-1]) if root.right == nil 
 
-    root.left = build_tree(0, array.find_index(data)-1, array) if root.left == nil 
-
-    root.right = build_tree(array.find_index(data)+1, last, array) if root.right == nil 
-
-    return root
+      return root
+    end
   end
-  
+
+  def insert(value, node = self.root)
+    if value < node.data
+      return node.left = Node.new(value) if node.left == nil
+      insert(value, node.left)
+    elsif value > node.data
+      return node.right = Node.new(value) if node.right == nil
+      insert(value, node.right)
+    else
+      return nil
+    end
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right 
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
