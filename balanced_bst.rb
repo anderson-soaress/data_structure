@@ -54,6 +54,7 @@ class Tree
   end
 
   def remove(value, node=self.root, node_parent=nil)
+    return nil if node == nil
     if value == node.data
       if !node.left && !node.right
         value < node_parent.data ?  node_parent.left = nil : node_parent.right = nil
@@ -83,6 +84,26 @@ class Tree
       find(value, node.right)
     else
       return pretty_print(node)
+    end
+  end
+
+  def level_order(queue = Array.new(1, self.root), noblock_array=[])
+    current_node = queue.shift
+
+    if block_given?  
+      yield current_node 
+    else
+      noblock_array << current_node.data
+    end
+
+    queue << current_node.left if current_node.left != nil
+    queue << current_node.right if current_node.right != nil
+
+    if !queue.empty? && block_given?
+      level_order(queue){|node| yield node} 
+    elsif !queue.empty?
+      level_order(queue, noblock_array)
+      return noblock_array
     end
   end
 
