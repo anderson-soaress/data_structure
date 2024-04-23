@@ -48,7 +48,31 @@ class Tree
     end
   end
 
-  def 
+  def find_near(node)
+    return node if node.left == nil
+    find_near(node.left)
+  end
+
+  def remove(value, node=self.root, node_parent=nil)
+    if value == node.data
+      if !node.left && !node.right
+        value < node_parent.data ?  node_parent.left = nil : node_parent.right = nil
+        return
+      elsif node.left && !node.right
+        value < node_parent.data ? node_parent.left = node.left : node_parent.right = node.left
+        return
+      elsif node.right && !node.left
+        value < node_parent.data ? node_parent.left = node.right : node_parent.right = node.right
+        return
+      else
+        near_node = find_near(node.right)
+        remove(near_node.data)
+        return node.data = near_node.data
+      end
+    end
+
+    value < node.data ? remove(value, node.left, node) : remove(value, node.right, node)
+  end
 
   def find(value, node=self.root)
     if node == nil 
@@ -68,7 +92,3 @@ class Tree
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
 end
-
-array = [0,1,2,3,4,5,6,7,8]
-tree = Tree.new(array)
-tree.pretty_print
