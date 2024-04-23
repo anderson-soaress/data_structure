@@ -158,6 +158,19 @@ class Tree
     node.data < c_node.data ? depth(node, c_node=c_node.left, depth+1) : depth(node, c_node=c_node.right, depth+1)
   end
 
+  def balanced?
+    left_height = height(root.left)
+    right_height = height(root.right)
+    (left_height - right_height).abs <= 1 ? true : false
+  end
+
+  def rebalance
+    if !self.balanced?
+      nodes = self.inorder
+      self.root = build_tree(nodes)
+    end
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right 
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
