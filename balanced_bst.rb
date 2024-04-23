@@ -107,6 +107,44 @@ class Tree
     end
   end
 
+  def inorder(node=self.root, inorder_array = [])
+    if block_given? 
+      inorder(node.left) {|node| yield node } if node.left != nil
+      yield node
+      inorder(node.right) {|node| yield node } if node.right != nil 
+    else
+      inorder(node.left, inorder_array) if node.left != nil
+      inorder_array << node.data
+      inorder(node.right, inorder_array) if node.right != nil 
+      inorder_array
+    end
+  end
+
+  def preorder(node=self.root, preorder_array = [])
+    if block_given?
+      yield node
+      preorder(node.left) {|node| yield node} if node.left != nil
+      preorder(node.right) {|node| yield node} if node.right != nil
+    else
+      preorder_array << node.data
+      preorder(node.left, preorder_array) if node.left != nil
+      preorder(node.right, preorder_array) if node.right != nil
+      preorder_array
+    end
+  end
+
+  def postorder(node=self.root, postorder_array = [])
+    if block_given?
+      postorder(node.left) {|node| yield node} if node.left != nil
+      postorder(node.right) {|node| yield node}  if node.right != nil
+      yield node
+    else
+      postorder(node.left, postorder_array) if node.left != nil
+      postorder(node.right, postorder_array) if node.right != nil
+      postorder_array << node.data
+    end
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right 
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
