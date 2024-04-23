@@ -83,7 +83,7 @@ class Tree
     elsif value > node.data
       find(value, node.right)
     else
-      return pretty_print(node)
+      return node
     end
   end
 
@@ -143,6 +143,19 @@ class Tree
       postorder(node.right, postorder_array) if node.right != nil
       postorder_array << node.data
     end
+  end
+
+  def height(node=self.root, left_height=1, right_height=1)
+    left_height += height(node.left) if node.left != nil
+    right_height += height(node.right) if node.right != nil
+
+    left_height > right_height ? left_height : right_height
+  end
+
+  def depth(node, c_node=self.root, depth=1)
+    return depth if node == c_node
+
+    node.data < c_node.data ? depth(node, c_node=c_node.left, depth+1) : depth(node, c_node=c_node.right, depth+1)
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
